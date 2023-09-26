@@ -43,7 +43,7 @@ math_scores_2021_2022 <-
 
 # Tidy and Clean Data -----------------------------------------------------
 
-third_grade_math_proficiency_2022_2023 <-
+third_grade_math_proficiency_2021_2022 <-
   math_scores_2021_2022 |> 
   filter(student_group == "Total Population (All Students)") |> 
   filter(grade_level == "Grade 3") |> 
@@ -58,12 +58,12 @@ third_grade_math_proficiency_2022_2023 <-
     proficiency_level == "number_level_1" ~ "1"
   )) 
 
-third_grade_math_proficiency_2022_2023 |> 
+third_grade_math_proficiency_2021_2022 |> 
   mutate(number_of_students = as.numeric(number_of_students)) |> 
   group_by(proficiency_level) |> 
   summarize(total_students = sum(number_of_students, na.rm = TRUE))
 
-third_grade_math_proficiency_2022_2023 |> 
+third_grade_math_proficiency_2021_2022 |> 
   mutate(number_of_students = parse_number(number_of_students)) |> 
   group_by(proficiency_level) |> 
   summarize(total_students = sum(number_of_students, na.rm = TRUE))

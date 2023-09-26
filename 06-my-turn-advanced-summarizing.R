@@ -50,32 +50,16 @@ third_grade_math_proficiency_2021_2022 <-
   select(academic_year, school_id, contains("number_level")) |> 
   pivot_longer(cols = starts_with("number_level"),
                names_to = "proficiency_level",
-               values_to = "number_of_students")
-
-third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = str_remove(proficiency_level, pattern = "number_level_"))
-
-third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = recode(proficiency_level, 
-                                    "number_level_4" = "4",
-                                    "number_level_3" = "3",
-                                    "number_level_2" = "2",
-                                    "number_level_1" = "1"))
-
-third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_4", true = "4", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_3", true = "3", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_2", true = "2", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_1", true = "1", false = proficiency_level))
-
-
-third_grade_math_proficiency_2021_2022 |> 
+               values_to = "number_of_students") |> 
   mutate(proficiency_level = case_when(
     proficiency_level == "number_level_4" ~ "4",
     proficiency_level == "number_level_3" ~ "3",
     proficiency_level == "number_level_2" ~ "2",
     proficiency_level == "number_level_1" ~ "1"
-  ))
+  )) |> 
+  mutate(number_of_students = parse_number(number_of_students))
 
 third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = parse_number(proficiency_level))
+  group_by(school_id) |> 
+  mutate(pct = number_of_students / sum(number_of_students, na.rm = TRUE)) |> 
+  ungroup()

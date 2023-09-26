@@ -43,7 +43,7 @@ math_scores_2021_2022 <-
 
 # Tidy and Clean Data -----------------------------------------------------
 
-third_grade_math_proficiency_2022_2023 <-
+third_grade_math_proficiency_2021_2022 <-
   math_scores_2021_2022 |> 
   filter(student_group == "Total Population (All Students)") |> 
   filter(grade_level == "Grade 3") |> 
