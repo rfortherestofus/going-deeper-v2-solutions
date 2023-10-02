@@ -1,19 +1,17 @@
 # Load Packages -----------------------------------------------------------
 
 library(tidyverse)
-library(fs)
-library(readxl)
 library(janitor)
+library(readxl)
+library(fs)
 
-# Create Directories ------------------------------------------------------
+# Create Directory --------------------------------------------------------
 
 dir_create("data-raw")
 
 # Download Data -----------------------------------------------------------
 
-# https://www.oregon.gov/ode/educator-resources/assessment/Pages/Assessment-Group-Reports.aspx
-
-# download.file("https://www.oregon.gov/ode/educator-resources/assessment/Documents/TestResults2122/pagr_schools_math_tot_raceethnicity_2122.xlsx",
+# download.file(url = "https://www.oregon.gov/ode/educator-resources/assessment/Documents/TestResults2122/pagr_schools_math_tot_raceethnicity_2122.xlsx",
 #               mode = "wb",
 #               destfile = "data-raw/pagr_schools_math_tot_raceethnicity_2122.xlsx")
 # 
@@ -33,27 +31,24 @@ dir_create("data-raw")
 #               mode = "wb",
 #               destfile = "data-raw/pagr_schools_math_raceethnicity_1516.xlsx")
 
-
 # Import Data -------------------------------------------------------------
 
 math_scores_2021_2022 <-
-  read_excel(path = "data-raw/pagr_schools_math_tot_raceethnicity_2122.xlsx") |> 
+  read_excel("data-raw/pagr_schools_math_tot_raceethnicity_2122.xlsx") |> 
   clean_names()
-
-
-# Tidy and Clean Data -----------------------------------------------------
 
 third_grade_math_proficiency_2021_2022 <-
   math_scores_2021_2022 |> 
   filter(student_group == "Total Population (All Students)") |> 
   filter(grade_level == "Grade 3") |> 
-  select(academic_year, school_id, contains("number_level")) |> 
-  pivot_longer(cols = starts_with("number_level"),
+  select(academic_year, school_id, contains("number_level_")) |> 
+  pivot_longer(cols = contains("number_level_"),
                names_to = "proficiency_level",
                values_to = "number_of_students")
 
 third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = str_remove(proficiency_level, pattern = "number_level_"))
+  mutate(proficiency_level = str_remove(proficiency_level,
+                                        pattern = "number_level_"))
 
 third_grade_math_proficiency_2021_2022 |> 
   mutate(proficiency_level = recode(proficiency_level, 
@@ -63,11 +58,18 @@ third_grade_math_proficiency_2021_2022 |>
                                     "number_level_1" = "1"))
 
 third_grade_math_proficiency_2021_2022 |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_4", true = "4", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_3", true = "3", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_2", true = "2", false = proficiency_level)) |> 
-  mutate(proficiency_level = if_else(proficiency_level == "number_level_1", true = "1", false = proficiency_level))
-
+  mutate(proficiency_level = if_else(proficiency_level == "number_level_4", 
+                                     true = "4", 
+                                     false = proficiency_level)) |> 
+  mutate(proficiency_level = if_else(proficiency_level == "number_level_3", 
+                                     true = "3", 
+                                     false = proficiency_level)) |> 
+  mutate(proficiency_level = if_else(proficiency_level == "number_level_2", 
+                                     true = "2", 
+                                     false = proficiency_level)) |> 
+  mutate(proficiency_level = if_else(proficiency_level == "number_level_1", 
+                                     true = "1", 
+                                     false = proficiency_level))
 
 third_grade_math_proficiency_2021_2022 |> 
   mutate(proficiency_level = case_when(

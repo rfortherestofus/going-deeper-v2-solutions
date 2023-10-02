@@ -43,22 +43,8 @@ enrollment_2022_2023 <- read_excel(path = "data-raw/fallmembershipreport_2022202
 
 enrollment_by_race_ethnicity_2022_2023 <-
   enrollment_2022_2023 |> 
-  select(district_institution_id, x2022_23_american_indian_alaska_native:x2022_23_white) |> 
+  select(district_institution_id, x2022_23_american_indian_alaska_native:x2022_23_percent_multi_racial) |> 
   select(-contains("percent")) |> 
   pivot_longer(cols = -district_institution_id,
                names_to = "race_ethnicity",
-               values_to = "number_of_students") |> 
-  mutate(race_ethnicity = str_remove(race_ethnicity, pattern = "x2022_23_")) |> 
-  mutate(race_ethnicity = case_when(
-    race_ethnicity == "american_indian_alaska_native" ~ "American Indian Alaska Native",
-    race_ethnicity == "asian" ~ "Asian",
-    race_ethnicity == "black_african_american" ~ "Black/African American",
-    race_ethnicity == "hispanic_latino" ~ "Hispanic/Latino",
-    race_ethnicity == "multiracial" ~ "Multi-Racial",
-    race_ethnicity == "native_hawaiian_pacific_islander" ~ "Native Hawaiian Pacific Islander",
-    race_ethnicity == "white" ~ "White"
-  ))
-
-enrollment_by_race_ethnicity_2022_2023 |> 
-  mutate(number_of_students = parse_number(number_of_students)) |> 
-  summarize(total_students = sum(number_of_students, na.rm = TRUE))
+               values_to = "number_of_students") 
